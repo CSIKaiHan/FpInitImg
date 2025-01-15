@@ -1,0 +1,40 @@
+import pandas as pd
+from openpyxl import load_workbook
+from openpyxl.utils import get_column_letter
+
+def fill_data_with_serial(file_path, save_path, data_list, start_row=9):
+    """
+    將串列資料填入 Excel 指定位置，並加入流水號
+    
+    參數:
+    file_path (str): 原始 Excel 檔案路徑
+    save_path (str): 儲存位置
+    data_list (list): 要填入的資料串列
+    start_row (int): 開始填入的列數，預設為 9
+    """
+    # 載入工作簿
+    wb = load_workbook(file_path)
+    ws = wb.active
+    
+    # 填入資料
+    for i, value in enumerate(data_list):
+        # 填入流水號（A 欄）
+        ws[f'A{start_row + i}'] = i + 1
+        
+        # 填入資料（B 欄）
+        ws[f'B{start_row + i}'] = value
+    
+    # 儲存檔案
+    wb.save(save_path)
+    print(f"資料已成功填入並儲存至: {save_path}")
+
+# 使用範例
+if __name__ == "__main__":
+    # 假設這是你要填入的資料串列
+    data = ['項目1', '項目2', '項目3', '項目4', '項目5']
+    
+    fill_data_with_serial(
+        file_path='原始檔案.xlsx',
+        save_path='填寫後檔案.xlsx',
+        data_list=data
+    )
