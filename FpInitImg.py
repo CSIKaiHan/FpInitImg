@@ -3,6 +3,7 @@ import re
 import tkinter as tk
 import sys
 from openpyxl import load_workbook
+from openpyxl.drawing.image import Image as XLImage
 from tkinter import filedialog
 from tkinter import messagebox
 from docx import Document
@@ -166,22 +167,27 @@ def make_table_xlsx(event_number, event_name, illustrations):
             illustration.append((number,'比中',f'關係人{_}','否'))
 
     start_row = 10
-    max_default_row = 15
 
     if len(illustration) > 6:
-        extra_rows_needed = len(illustration) - 6
-        ws.insert_rows(max_default_row + 1, extra_rows_needed)
+        ws.delete_rows(start_row + len(illustration), 50 - len(illustration))
+    else:
+        ws.delete_rows(start_row + len(illustration), 44)
 
     for i, value in enumerate(illustration):
         ws.cell(row=start_row + i, column=1, value=i + 1)
         for j in range(4):
             ws.cell(row=start_row + i, column=j+2, value=value[j])
 
-    cell_e1 = ws['E1']
-    cell_e1.value = cell_e1.value.replace('#', str(event_number))
+    cell_d1 = ws['D1']
+    cell_d1.value = cell_d1.value.replace('#', str(event_number))
 
     cell_a3 = ws['A3']
     cell_a3.value = cell_a3.value.replace('#', event_name)
+
+    img = XLImage('頁尾.png')
+    img.width = 743
+    img.height = 454
+    ws.add_image(img, 'A'+str(ws.max_row))
 
     wb.save(f'{os.path.join(task_folder, event_number)}初鑑報告書.xlsx')
 
@@ -260,7 +266,8 @@ def main():
         elif input_value == '2':
             make_table_xlsx(event_number, event_name, illustrations)
         messagebox.showinfo('成功', '執行成功！')
-    except Exception:
+    except Exception as e:
+        print(e)
         messagebox.showerror('錯誤', '執行失敗！')
         sys.exit(1)
 
